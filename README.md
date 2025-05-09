@@ -27,6 +27,10 @@ A robust task processing system built with Flask, Celery, RabbitMQ, and Redis. T
   - Detailed error logging
   - Task failure notifications
 
+
+![System Architecture](images/Architectural%20Diagram.png)
+
+
 ## Prerequisites
 
 - Python 3.8+
