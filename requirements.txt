@@ -1,0 +1,15 @@
+flask==3.0.2
+flask-cors==4.0.0
+celery==5.3.6
+redis==5.0.1
+python-dotenv==1.0.1
+psutil==5.9.8
+billiard==4.2.0
+kombu==5.3.5
+vine==5.1.0
+click-didyoumean==0.3.0
+click-plugins==1.1.1
+click-repl==0.3.0
+prompt-toolkit==3.0.43
+pika==1.3.2
+requests==2.31.0 
