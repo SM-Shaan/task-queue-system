@@ -22,6 +22,9 @@ task_queues = (
     Queue('default', Exchange('default', type='direct'), routing_key='default'),
     Queue('high_priority', Exchange('high_priority', type='direct'), routing_key='high_priority'),
     Queue('low_priority', Exchange('low_priority', type='direct'), routing_key='low_priority'),
+    Queue('data_processing', Exchange('data_processing', type='direct'), routing_key='data_processing'),
+    Queue('email_sending', Exchange('email_sending', type='direct'), routing_key='email_sending'),
+    Queue('file_processing', Exchange('file_processing', type='direct'), routing_key='file_processing'),
 )
 
 task_queues = tuple(
@@ -41,15 +44,30 @@ task_routes = {
     }
 }
 
+# Add task-specific routing
+task_routes.update({
+    'tasks.process_data_task': {'queue': 'data_processing', 'routing_key': 'data_processing'},
+    'tasks.send_email_task': {'queue': 'email_sending', 'routing_key': 'email_sending'},
+    'tasks.process_file_task': {'queue': 'file_processing', 'routing_key': 'file_processing'},
+})
+
+# Configure task retry policy
+task_annotations = {
+    'tasks.process_task': {
+        'rate_limit': '10/s',
+        'retry_backoff': True,
+        'retry_backoff_max': 600,  # Maximum retry delay in seconds
+        'max_retries': 3,  # Maximum number of retries
+        'retry_jitter': True  # Add jitter to prevent thundering herd
+    }
+}
+
 task_acks_late = True
 task_reject_on_worker_lost = True
 task_track_started = True
 task_time_limit = 3600
 task_soft_time_limit = 3300
 task_create_missing_queues = True
-task_annotations = {
-    'tasks.process_task': {'rate_limit': '10/s'}
-}
 
 broker_connection_retry = True
 broker_connection_retry_on_startup = True

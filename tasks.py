@@ -72,14 +72,21 @@ def process_task(self, task_type, priority='normal', parameters=None, delay=0):
         if random.random() < 0.1:
             raise TaskError("Random task failure simulation")
         
-        if task_type == 'data_processing':
-            result = process_data_task(parameters or {})
-        elif task_type == 'email_sending':
-            result = send_email_task(parameters or {})
-        elif task_type == 'file_processing':
-            result = process_file_task(parameters or {})
-        else:
-            raise TaskError(f"Unknown task type: {task_type}")
+        try:
+            # Route to specific task handler based on task_type
+            if task_type == 'data_processing':
+                result = process_data_task(parameters or {})
+            elif task_type == 'email_sending':
+                result = send_email_task(parameters or {})
+            elif task_type == 'file_processing':
+                result = process_file_task(parameters or {})
+            else:
+                raise TaskError(f"Unknown task type: {task_type}")
+        except Exception as exc:
+            # Calculate retry delay with exponential backoff
+            retry_delay = min(2 ** self.request.retries * 60, 600)  # Max 10 minutes
+            task_logger.warning(f"Task failed, retrying in {retry_delay} seconds. Error: {str(exc)}")
+            raise self.retry(exc=exc, countdown=retry_delay)
         
         task_logger.info(f"Task completed successfully: {result}")
         return {
@@ -98,6 +105,20 @@ def process_task(self, task_type, priority='normal', parameters=None, delay=0):
         task_logger.error(f"Task failed: {str(exc)}\n{traceback.format_exc()}")
         # Raise the exception to properly mark the task as failed
         raise TaskError(str(exc), {'traceback': traceback.format_exc()})
+
+def submit_task_with_priority(task_type, priority='normal', parameters=None, delay=0):
+    """Submit a task with priority-based routing."""
+    queue = {
+        'high': 'high_priority',
+        'low': 'low_priority',
+        'normal': 'default'
+    }.get(priority, 'default')
+    
+    return process_task.apply_async(
+        args=[task_type, priority, parameters, delay],
+        queue=queue,
+        routing_key=queue
+    )
 
 def get_task_status(task_id):
     try:

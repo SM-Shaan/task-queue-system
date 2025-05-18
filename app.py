@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from tasks import process_task, get_task_status, celery_app
+from tasks import process_task, get_task_status, celery_app, submit_task_with_priority
 import os
 from dotenv import load_dotenv
 import logging
@@ -55,10 +55,12 @@ def submit_task():
             
         app.logger.info(f"Submitting task: type={task_type}, priority={priority}, parameters={parameters}, delay={delay}")
         
-        # Submit task to Celery with countdown for delay
-        task = process_task.apply_async(
-            args=[task_type, priority, parameters, delay],
-            countdown=delay
+        # Submit task with priority-based routing
+        task = submit_task_with_priority(
+            task_type=task_type,
+            priority=priority,
+            parameters=parameters,
+            delay=delay
         )
         
         app.logger.info(f"Task submitted successfully: {task.id}")

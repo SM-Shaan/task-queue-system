@@ -49,23 +49,51 @@ services:
 
   worker:
     build: .
-    environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+    command: celery -A tasks worker --loglevel=info -Q default,high_priority,low_priority
     volumes:
       - .:/app
-    command: >
-      bash -c "
-        echo 'Waiting for RabbitMQ to be ready...' &&
-        sleep 10 &&
-        python init_queues.py &&
-        celery -A tasks worker --pool=solo --loglevel=info --events
-      "
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - rabbitmq
+      - redis
+
+  data_worker:
+    build: .
+    command: celery -A tasks worker --loglevel=info -Q data_processing
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - rabbitmq
+      - redis
+
+  email_worker:
+    build: .
+    command: celery -A tasks worker --loglevel=info -Q email_sending
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - rabbitmq
+      - redis
+
+  file_worker:
+    build: .
+    command: celery -A tasks worker --loglevel=info -Q file_processing
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - rabbitmq
+      - redis
 
   # Flower is a web-based tool for monitoring and managing Celery tasks.
   flower:
