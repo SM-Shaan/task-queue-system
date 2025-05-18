@@ -32,7 +32,7 @@ A robust distributed task processing system built with Flask, Celery, and Docker
 
 The system consists of the following components:
 
-![System Architecture](images\task1.svg)
+![System Architecture](images/task.svg)
 
 1. **Web Application (Flask)**
    - RESTful API endpoints
@@ -200,7 +200,7 @@ The test suite verifies:
 ## Error Handling
 
 The system implements several error handling mechanisms:
-![Error Handling diagram](images\error.svg)
+![Error Handling diagram](images/error.svg)
 
 1. **Task Retries**
    - Exponential backoff
