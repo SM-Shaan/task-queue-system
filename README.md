@@ -65,6 +65,18 @@ RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672//
 REDIS_URL=redis://redis:6379/0
 ```
 
+## Monitoring
+
+### RabbitMQ Management UI
+- Access at: http://localhost:15672
+- Default credentials: guest/guest
+- Monitor queues, exchanges, and connections
+
+### Redis Monitoring
+- Monitor task results and states
+- View task history and statistics
+
+
 ## Running the System
 
 1. Start all services using Docker Compose:
@@ -80,10 +92,18 @@ This will start:
 
 ## API Documentation
 
-### 1. Submit a Task
-```http
-POST /api/tasks
+Open Postman application. Then, follow the following commands:
+```
+POST http://localhost:5000/api/tasks
+```
+In header section:
+```
 Content-Type: application/json
+```
+### 1. Submit a Task
+In body section:
+```http
+
 
 {
     "task_type": "data_processing",
@@ -112,10 +132,18 @@ GET /api/tasks/{task_id}
 Response:
 ```json
 {
-    "task_id": "task-uuid",
     "state": "SUCCESS",
-    "status": "Task completed successfully",
-    "result": "task result"
+    "status": {
+        "priority": "high",
+        "result": {
+            "data": {
+                "data": "example data"
+            },
+            "processed": true
+        },
+        "status": "completed",
+        "task_type": "data_processing"
+    }
 }
 ```
 
@@ -177,16 +205,6 @@ Response:
 - Processes files with configurable options
 - Supports different file formats
 
-## Monitoring
-
-### RabbitMQ Management UI
-- Access at: http://localhost:15672
-- Default credentials: guest/guest
-- Monitor queues, exchanges, and connections
-
-### Redis Monitoring
-- Monitor task results and states
-- View task history and statistics
 
 ## Error Handling
 

@@ -67,6 +67,21 @@ services:
         celery -A tasks worker --pool=solo --loglevel=info --events
       "
 
+  # Flower is a web-based tool for monitoring and managing Celery tasks.
+  flower:
+    build: .
+    ports:
+      - "5555:5555"
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A tasks flower --port=5555
+
 volumes:
   rabbitmq_data:
   redis_data:

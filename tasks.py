@@ -7,6 +7,7 @@ import logging
 import traceback
 import json
 from celery.utils.log import get_task_logger
+import random
 
 load_dotenv()
 
@@ -47,9 +48,9 @@ def process_file_task(parameters):
     time.sleep(3)  # Simulate work
     return {'processed': True, 'filename': parameters.get('filename')}
 
-@celery_app.task(name='tasks.process_task')
-def process_task(task_type, priority='normal', parameters=None):
-    task_logger.info(f"Starting task processing: type={task_type}, priority={priority}, parameters={parameters}")
+@celery_app.task(name='tasks.process_task', bind=True)
+def process_task(self, task_type, priority='normal', parameters=None, delay=0):
+    task_logger.info(f"Starting task processing: type={task_type}, priority={priority}, parameters={parameters}, delay={delay}")
     
     try:
         if not isinstance(task_type, str):
@@ -60,6 +61,16 @@ def process_task(task_type, priority='normal', parameters=None):
             
         if parameters is not None and not isinstance(parameters, dict):
             raise TaskError("parameters must be a dictionary or None")
+            
+        if not isinstance(delay, (int, float)) or delay < 0:
+            raise TaskError("delay must be a non-negative number")
+        
+        # Update task state to STARTED
+        self.update_state(state='STARTED', meta={'status': 'Task processing started'})
+        
+        # Simulate random failure (10% chance)
+        if random.random() < 0.1:
+            raise TaskError("Random task failure simulation")
         
         if task_type == 'data_processing':
             result = process_data_task(parameters or {})
@@ -75,20 +86,18 @@ def process_task(task_type, priority='normal', parameters=None):
             'status': 'completed',
             'result': result,
             'task_type': task_type,
-            'priority': priority
+            'priority': priority,
+            'delay': delay
         }
     
     except TaskError as exc:
         task_logger.error(f"Task failed: {str(exc)}")
-        return exc.to_dict()
+        # Raise the exception to properly mark the task as failed
+        raise exc
     except Exception as exc:
         task_logger.error(f"Task failed: {str(exc)}\n{traceback.format_exc()}")
-        return {
-            'error': str(exc),
-            'details': {
-                'traceback': traceback.format_exc()
-            }
-        }
+        # Raise the exception to properly mark the task as failed
+        raise TaskError(str(exc), {'traceback': traceback.format_exc()})
 
 def get_task_status(task_id):
     try:
@@ -96,7 +105,20 @@ def get_task_status(task_id):
         if task.state == 'PENDING':
             response = {
                 'state': task.state,
-                'status': 'Task is waiting for execution or unknown'
+                'status': 'Task is waiting for execution or unknown',
+                'info': task.info if task.info else None
+            }
+        elif task.state == 'STARTED':
+            response = {
+                'state': task.state,
+                'status': 'Task has been started',
+                'info': task.info if task.info else None
+            }
+        elif task.state == 'RETRY':
+            response = {
+                'state': task.state,
+                'status': 'Task is being retried',
+                'info': task.info if task.info else None
             }
         elif task.state == 'FAILURE':
             error_info = task.info
@@ -115,7 +137,8 @@ def get_task_status(task_id):
         else:
             response = {
                 'state': task.state,
-                'status': task.info
+                'status': task.info if task.info else 'Task completed',
+                'result': task.info if task.info else None
             }
         task_logger.debug(f"Task status for {task_id}: {response}")
         return response
