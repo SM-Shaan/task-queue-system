@@ -200,6 +200,7 @@ The test suite verifies:
 ## Error Handling
 
 The system implements several error handling mechanisms:
+
 ![Error Handling diagram](images/error.svg)
 
 1. **Task Retries**
