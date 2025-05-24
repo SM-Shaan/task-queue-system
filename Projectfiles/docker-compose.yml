@@ -1,14 +1,12 @@
-version: '3.8'
-
 services:
   rabbitmq:
     image: rabbitmq:3-management
     ports:
       - "5672:5672"   # AMQP protocol port
-      - "15672:15672" # Management UI port
+      - "15672:15672" # Management UI port (optional, restrict in production)
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-guest}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS:-guest}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -30,13 +28,16 @@ services:
       retries: 5
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: myapp-web:latest
     ports:
       - "5000:5000"
     environment:
       - FLASK_APP=app.py
-      - FLASK_ENV=development
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - FLASK_ENV=development  # Use development for local testing
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       rabbitmq:
@@ -44,71 +45,85 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - .:/app
-    command: flask run --host=0.0.0.0
+      - .:/app:ro  # Read-only for production, but can be writable locally
+    entrypoint: ["sh", "-c", "python3 init_queues.py && flask run --host=0.0.0.0 --port=5000"]
+    
 
   worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: myapp-worker:latest
     command: celery -A tasks worker --loglevel=info -Q default,high_priority,low_priority
-    volumes:
-      - .:/app
     environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - rabbitmq
       - redis
+    volumes:
+      - .:/app:ro
 
   data_worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: myapp-data-worker:latest
     command: celery -A tasks worker --loglevel=info -Q data_processing
-    volumes:
-      - .:/app
     environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - rabbitmq
       - redis
+    volumes:
+      - .:/app:ro
 
   email_worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: myapp-email-worker:latest
     command: celery -A tasks worker --loglevel=info -Q email_sending
-    volumes:
-      - .:/app
     environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - rabbitmq
       - redis
+    volumes:
+      - .:/app:ro
 
   file_worker:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: myapp-file-worker:latest
     command: celery -A tasks worker --loglevel=info -Q file_processing
-    volumes:
-      - .:/app
     environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - rabbitmq
       - redis
+    volumes:
+      - .:/app:ro
 
-  # Flower is a web-based tool for monitoring and managing Celery tasks.
   flower:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.flower
+    image: myapp-flower:latest
     ports:
       - "5555:5555"
     environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       rabbitmq:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: celery -A tasks flower --port=5555
 
 volumes:
   rabbitmq_data:

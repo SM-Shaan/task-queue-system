@@ -2,6 +2,21 @@
 
 A robust distributed task processing system built with Flask, Celery, and Docker. This system provides priority-based task routing, automatic retries with exponential backoff, and real-time task monitoring.
 
+## Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Monitoring](#monitoring)
+- [RabbitMQ Management UI](#rabbitmq-management-ui)
+- [Testing](#testing)
+- [Configuration](#configuration)
+- [Error Handling](#error-handling)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
 - **Priority-based Task Routing**
