@@ -1,4 +1,5 @@
 # Chapter 2: Deploying and Testing the Task Queue System on AWS EC2
+# Chapter 2: Deploying and Testing the Task Queue System on AWS EC2
 
 This guide provides step-by-step instructions to deploy the Task Queue System (a Celery-based application with Flask, RabbitMQ, Redis, and Flower) on a signle AWS EC2 instance and test its functionality. The deployment uses Docker and Docker Compose for containerization.
 
@@ -13,6 +14,7 @@ This guide provides step-by-step instructions to deploy the Task Queue System (a
 - [Starting the Application](#starting-the-application)
 - [Testing the Deployment](#testing-the-deployment)
 - [***Troubleshooting***](#troubleshooting)
+- [***Troubleshooting***](#troubleshooting)
 - [Production Considerations](#production-considerations)
 - [License](#license)
 
@@ -26,9 +28,18 @@ This project is divided into various chapters, each demonstrating different impl
 - **Chapter 2**: AWS deployment steps ([Read more](DOC/Lab-02/aws-deployment.md))
 - **Chapter 3**: Multi-EC2 instance deployment using Pulumi ([Read more](DOC\Lab-03\pulumi.md))
 
+## 🎯 Project Overview
+
+This project is divided into various chapters, each demonstrating different implementation approaches and deployment strategies:
+
+- **Chapter 1**: Local machine and Poridhi lab implementation ([Read more](README.md))
+- **Chapter 2**: AWS deployment steps ([Read more](DOC/Lab-02/aws-deployment.md))
+- **Chapter 3**: Multi-EC2 instance deployment using Pulumi ([Read more](DOC\Lab-03\pulumi.md))
+
 ## Prerequisites
 
 * An AWS account with access to the EC2 service.
+* A key pair (e.g., `key-pair.pem`) for SSH access, downloaded to your local machine (e.g., `E:\key-pair.pem` on Windows).
 * A key pair (e.g., `key-pair.pem`) for SSH access, downloaded to your local machine (e.g., `E:\key-pair.pem` on Windows).
 * Basic knowledge of AWS, SSH, and Docker.
 
@@ -184,6 +195,7 @@ Now, we'll launch an EC2 instance within our VPC:
 Create a security group to control inbound and outbound traffic:
 
   * Configure a security group with inbound rules:
+  * Configure a security group with inbound rules:
 
   * SSH (port 22) from your IP or `0.0.0.0/0` (restrict in production).
   * HTTP (port 5000) for Flask.
@@ -196,6 +208,10 @@ Create a security group to control inbound and outbound traffic:
    ![alt text](../Lab-02/images/23.png)
    ![alt text](../Lab-02/images/24.png)
 
+8. Add Storage:
+   - Keep the default settings (8GB General Purpose SSD)
+9. Review and click "Launch"
+10. Click "Launch Instances"
 8. Add Storage:
    - Keep the default settings (8GB General Purpose SSD)
 9. Review and click "Launch"
@@ -254,6 +270,7 @@ sudo usermod -aG docker ubuntu
 ```bash
 exit
 ssh -i E:\key-pair.pem ubuntu@13.229.231.177
+ssh -i E:\key-pair.pem ubuntu@13.229.231.177
 ```
 
 **Install Docker Compose:**
@@ -267,10 +284,12 @@ docker-compose --version
 ---
 
 ### 4. Transfer Project Files (from CMD) IF  all required in it.
+### 4. Transfer Project Files (from CMD) IF  all required in it.
 
 From your local machine:
 
 ```bash
+scp -i "D:\key_pair.pem" -r "D:\task-queue-system\Projectfiles" ubuntu@13.229.231.177:/home/ubuntu/Task_queue_system
 scp -i "D:\key_pair.pem" -r "D:\task-queue-system\Projectfiles" ubuntu@13.229.231.177:/home/ubuntu/Task_queue_system
 ```
 
@@ -352,6 +371,7 @@ sudo reboot
 
 ```bash
 ssh -i E:\key-pair.pem ubuntu@13.229.231.177
+ssh -i E:\key-pair.pem ubuntu@13.229.231.177
 cd /home/ubuntu/My_web
 docker-compose -f docker-compose.aws.yml up -d
 ```
@@ -365,14 +385,17 @@ docker-compose -f docker-compose.aws.yml up -d
 **Flask API:**
 
 * From local machine:
+* From local machine:
 
 ```bash
 curl http://localhost:5000/
 ```
 
 * From EC2 instance:
+* From EC2 instance:
 
 ```bash
+curl http://13.229.231.177:5000/
 curl http://13.229.231.177:5000/
 ```
 
@@ -385,14 +408,17 @@ Expected output:
 **Flower:**
 
 * Open [http://13.229.231.177:5555/](http://13.229.231.177:5555/) in browser.
+* Open [http://13.229.231.177:5555/](http://13.229.231.177:5555/) in browser.
 
 **RabbitMQ Management UI:**
 
+* Open [http://13.229.231.177:15672/](http://13.229.231.177:15672/) (username: `admin`, password: from `.env`).
 * Open [http://13.229.231.177:15672/](http://13.229.231.177:15672/) (username: `admin`, password: from `.env`).
 
 ### 2. Test Task Submission
 
 ```bash
+curl -X POST http://13.229.231.177:5000/api/tasks \
 curl -X POST http://13.229.231.177:5000/api/tasks \
   -H "Content-Type: application/json" \
   -d '{"task_type": "data_processing", "priority": "high", "parameters": {"data": "test"}, "delay": 0}'
@@ -403,6 +429,7 @@ curl -X POST http://13.229.231.177:5000/api/tasks \
 ### 3. Check Task Status
 
 ```bash
+curl http://13.229.231.177:5000/api/tasks/<task_id>
 curl http://13.229.231.177:5000/api/tasks/<task_id>
 ```
 
@@ -420,6 +447,9 @@ Expected output:
 Fix key permissions:
 
 ```bash
+icacls E:\key-pair.pem /inheritance:r
+icacls E:\key-pair.pem /remove "NT AUTHORITY\Authenticated Users" "BUILTIN\Users" "BUILTIN\Administrators" "NT AUTHORITY\SYSTEM"
+icacls E:\key-pair.pem /grant:r "DESKTOP-RN29TTL\Shaan:F"
 icacls E:\key-pair.pem /inheritance:r
 icacls E:\key-pair.pem /remove "NT AUTHORITY\Authenticated Users" "BUILTIN\Users" "BUILTIN\Administrators" "NT AUTHORITY\SYSTEM"
 icacls E:\key-pair.pem /grant:r "DESKTOP-RN29TTL\Shaan:F"
