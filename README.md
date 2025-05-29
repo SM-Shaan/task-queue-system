@@ -22,9 +22,9 @@ A robust distributed task processing system built with Flask, Celery, and Docker
 
 This project is divided into various chapters, each demonstrating different implementation approaches and deployment strategies:
 
-- **Chapter 1**: Local machine and Poridhi lab implementation
-- **Chapter 2**: AWS deployment steps
-- **Chapter 3**: Multi-EC2 instance deployment using Pulumi
+- **Chapter 1**: Local machine and Poridhi lab implementation ([Read more](README.md))
+- **Chapter 2**: AWS deployment steps ([Read more](DOC/Lab-02/aws-deployment.md))
+- **Chapter 3**: Multi-EC2 instance deployment using Pulumi ([Read more](DOC\Lab-03\pulumi.md))
 
 ## 🏗️ System Architecture
 
