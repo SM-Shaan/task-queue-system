@@ -36,7 +36,7 @@ services:
       - "5000:5000"
     environment:
       - FLASK_APP=app.py
-      - FLASK_ENV=development  # Use development for local testing
+      - FLASK_ENV=development
       - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
       - REDIS_URL=redis://redis:6379/0
     depends_on:
@@ -45,9 +45,8 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - .:/app:ro  # Read-only for production, but can be writable locally
-    entrypoint: ["sh", "-c", "python3 init_queues.py && flask run --host=0.0.0.0 --port=5000"]
-    
+      - .:/app:ro
+    command: ["sh", "-c", "python3 init_queues.py && flask run --host=0.0.0.0 --port=5000"]
 
   worker:
     build:
@@ -117,8 +116,8 @@ services:
     ports:
       - "5555:5555"
     environment:
-      - RABBITMQ_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
-      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASS:-guest}@rabbitmq:5672/
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       rabbitmq:
         condition: service_healthy

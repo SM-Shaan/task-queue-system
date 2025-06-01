@@ -11,7 +11,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-BASE_URL = 'http://localhost:5000/api'
+BASE_URL = 'http://13.215.46.60:5000/api'
 
 def submit_task(task_type, priority='normal', parameters=None, delay=0):
     url = f"{BASE_URL}/tasks"
