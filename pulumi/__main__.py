@@ -154,6 +154,12 @@ worker_sg = aws.ec2.SecurityGroup("worker-sg",
     ingress=[
         aws.ec2.SecurityGroupIngressArgs(
             protocol="tcp",
+            from_port=5555,
+            to_port=5555,
+            cidr_blocks=["0.0.0.0/0"]
+        ),
+        aws.ec2.SecurityGroupIngressArgs(
+            protocol="tcp",
             from_port=22,
             to_port=22,
             cidr_blocks=["0.0.0.0/0"]  # Restrict to your IP in production
@@ -199,8 +205,7 @@ flower_sg = aws.ec2.SecurityGroup("flower-sg",
 # Create an EC2 key pair
 key_pair = aws.ec2.KeyPair("app-key-pair",
     key_name="app-key-pair",
-    # public_key="ssh-rsa YOUR_PUBLIC_KEY_HERE"  # Replace with your public key
-    public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDsUbMqDo3hsFL2OaXqahfjIHoOqGUcpqaLpHNxjO0VR/NGA23PiD7i9AH5bIyAgjkZuGZhiKqJtr6ZMlTDh+lbXjX2dcTcn0m+QI6DD7uGROG/X4O9WjJi5jpYLRCXClGH6J57LNtRueorBga4LwK8KMt8rtsRah9KbafPTFDFhWu3mcj4B6JTHqF+s6o/zqyaZ6iSeGBd8zssHg1r7TJhzfwFyXe1MHMe2+gA/OFxc01iN09AraRgZ7baTHu1hk3hmV8h3+EHtfz9YHLhVANRE2i/l9AoupmMZwkUEaVwz95YrVTjMuHChSPLVdUlxbUZF0G2meOt9ba0hNfC8Mgl shaan@DESKTOP-RN29TTL"  # Replace with your public key
+    public_key="ssh-rsa YOUR_PUBLIC_KEY_HERE"  # Replace with your public key
 )
 
 

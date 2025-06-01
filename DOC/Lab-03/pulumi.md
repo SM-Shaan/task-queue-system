@@ -26,6 +26,14 @@
 
 This project guides you through setting up an asynchronous task queue processing system on AWS using Pulumi for infrastructure automation. The system is secure, containerized with Docker, and deployed on AWS EC2 instances within a custom VPC. This `README.md` provides step-by-step instructions to configure, deploy, manage, and troubleshoot the infrastructure.
 
+## 🎯 Project Overview
+
+This project is divided into various chapters, each demonstrating different implementation approaches and deployment strategies:
+
+- **Chapter 1**: Local machine and Poridhi lab implementation ([Read more](README.md))
+- **Chapter 2**: AWS deployment steps ([Read more](DOC/Lab-02/aws-deployment.md))
+- **Chapter 3**: Multi-EC2 instance deployment using Pulumi ([Read more](DOC\Lab-03\pulumi.md))
+
 ## Project Layout
 
 ```bash
@@ -42,7 +50,7 @@ asynchronous_task_queue_aws_deployment_in_multi_instances/
 
 ## Architecture Diagram
 
-![System Architecture](images/diagram.svg)
+![System Architecture](../Lab-03/images/pulumi.drawio.svg)
 
 
 ## Prerequisites
@@ -55,6 +63,7 @@ Before starting, ensure you have the following:
 - **SSH Key Pair**: For EC2 instance access.
 - **Docker**: Installed for containerized services.
 - **Git**: For version control (recommended).
+
 
 ## Setup Instructions
 
@@ -671,97 +680,7 @@ pulumi stack select dev
 
 ## Troubleshooting
 
-### 1. Chocolatey Not Recognized (Windows)
-
-**Error**: `choco : The term 'choco' is not recognized...`
-
-**Solution**:
-- Install Chocolatey in PowerShell (Run as Administrator):
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; `
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
-iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-```
-
-- Verify installation:
-
-```powershell
-choco --version
-```
-
-- Add Chocolatey to PATH (if needed):
-
-```powershell
-$env:Path += ";C:\ProgramData\chocolatey\bin"
-```
-
-- Install Pulumi:
-
-```powershell
-choco install pulumi -y
-```
-
-### 2. Pulumi Access Token Error
-
-**Error**: `error: invalid access token`
-
-**Solution**:
-- Log in using browser-based authentication:
-
-```bash
-pulumi login
-```
-
-- Press `Enter` to open the browser and authenticate.
-- Alternatively, use a token from [Pulumi Tokens](https://app.pulumi.com/account/tokens).
-
-### 3. SSH Key Pair Issues
-
-Ensure the `app-key-pair.pub` public key is correctly added to `__main__.py`. Restrict SSH access (port 22) to your IP in production for security.
-
-The resulting system is:
-- **Containerized**: Packaged in Docker containers.
-- **Cloud-hosted**: Deployed on AWS for high availability.
-- **Automated**: Managed with Pulumi's Infrastructure-as-Code.
-### 3.  How To access private_ip ?
-
-### 4. ModuleNotFoundError: No module named 'awscli'
-This means the Python AWS CLI wrapper isn't installed properly in your system.
-
-If you really want to use Python pip inside a virtual environment:
-```bash
-pip install awscli
-```
-Then confirm:
-
-```bash
-aws --version
-```
-But note: this can create conflicts on Windows if you have a global AWS CLI installed separately.
-
-### 5. No instances in aws console:
- Check AWS Region: Make sure you are viewing the correct region (ap-southeast-1) in the AWS Console. Instances created in a different region will not show up.
-
-### 6. Ip address is not working:
-```bash
- ssh -i "D:\asynchronous_task_processing_system_using_Flask_Celery_RabbitMQ\pulumi\app-key-pair" ubuntu@13.215.46.60
- ```
-
-You should now see your containers running.
- If You Still Don’t See Containers Running
-Check the cloud-init log for errors:
-```bash
-cat /var/log/cloud-init-output.log
-```
-This will show if any step in your user_data failed (e.g., git clone, docker-compose).
-
-The resulting system is:
-- **Containerized**: Packaged in Docker containers.
-- **Cloud-hosted**: Deployed on AWS for high availability.
-- **Automated**: Managed with Pulumi's Infrastructure-as-Code.
-
-
+Check here. ([Read more](DOC\Lab-03\troubleshooting.md))
 
 ## Resources
 
