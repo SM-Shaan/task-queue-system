@@ -602,10 +602,10 @@ Open Postman application. Then, follow the following commands:
 POST http://<web-instance-public-id>:5000/api/tasks
 ```
 You can see:
-![alt text](../../DOC/Lab-01/images/pulumi6.png)
+![alt text](./images/pulumi6.png)
 
 To check the task:
-![alt text](../../DOC/Lab-01/images/pulumi7.png)
+![alt text](./images/pulumi7.png)
 
 **Headers:**
 ```

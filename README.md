@@ -29,10 +29,10 @@ This project is divided into various chapters, each demonstrating different impl
 ## 🏗️ System Architecture
 
 ### 1. High-Level System Architecture
-![Priority Queue System diagram](../../DOC/Lab-01/images/archi.drawio.svg)
+![Priority Queue System diagram](./DOC/Lab-01/images/archi.drawio.svg)
 
 ### 2. Client Interaction Flow
-![Process Dataflow Sequence diagram](../../DOC/Lab-01/images/Dataflow.drawio.svg)
+![Process Dataflow Sequence diagram](./DOC/Lab-01/images/Dataflow.drawio.svg)
 The sequence diagram shows the complete lifecycle of a task from submission to status check:
 1. Client submits a task via POST request to Flask API
 2. Flask receives the request and queues the task in RabbitMQ
@@ -43,7 +43,7 @@ The sequence diagram shows the complete lifecycle of a task from submission to s
 7. Status is returned to the client
 
 ###  3. Priority Queue System
-![Priority Queue System diagram](../../DOC/Lab-01/images/priorityqueue.drawio.svg)
+![Priority Queue System diagram](./DOC/Lab-01/images/priorityqueue.drawio.svg)
 
 The priority queue system routes tasks based on their priority:
 - **High Priority Queue**: For urgent tasks that need immediate processing
@@ -52,7 +52,7 @@ The priority queue system routes tasks based on their priority:
 
 
 ###  4. Worker Processing Flow
-![Priority Queue System diagram](../../DOC/Lab-01/images/taskflow.svg)
+![Priority Queue System diagram](./DOC/Lab-01/images/taskflow.svg)
 
 Task lifecycle within a worker:
 - **Initial State**: Task arrives in the "Received" state
@@ -63,7 +63,7 @@ Task lifecycle within a worker:
 - **Final States**: Task either completes successfully or fails after max retries
 
 ### 5. Task Types and Workers
-![Priority Queue System diagram](../../DOC/Lab-01/images/task_worker.drawio.svg)
+![Priority Queue System diagram](./DOC/Lab-01/images/task_worker.drawio.svg)
 
 Specialized workers for different task types:
 - **Data Processing Tasks**: Handled by Data Worker
@@ -71,7 +71,7 @@ Specialized workers for different task types:
 - **File Processing Tasks**: Handled by File Worker
 
 ### 6. Monitoring System
-![Priority Queue System diagram](../../DOC/Lab-01/images/workerTask.drawio.svg)
+![Priority Queue System diagram](./DOC/Lab-01/images/workerTask.drawio.svg)
 Real-time monitoring capabilities:
 - Task Metrics: Performance and processing statistics
 - Worker Status: Health and availability of workers
@@ -81,7 +81,7 @@ Real-time monitoring capabilities:
 - Problem detection and resolution
 
 ### 7. Error Handling Flow
-![Priority Queue System diagram](../../DOC/Lab-01/images/taskflow.drawio.svg)
+![Priority Queue System diagram](./DOC/Lab-01/images/taskflow.drawio.svg)
 This diagram details the error handling process:
 When an error occurs, it triggers the retry logic
 Retry Logic implements exponential backoff strategy
@@ -137,7 +137,7 @@ docker-compose up -d
 
 1. Access the application through load balancer:
 
-![Load Balancer Setup](../../DOC/Lab-01/images/poridhilab.png)
+![Load Balancer Setup](./DOC/Lab-01/images/poridhilab.png)
 
 2. Configure IP and port:
 - Get IP from eth0 using `ifconfig`
@@ -145,16 +145,16 @@ docker-compose up -d
 
 3. Create load balancer in Poridhi lab:
 
-![Load Balancer Configuration](../../DOC/Lab-01/images/poridhilab2.png)
+![Load Balancer Configuration](./DOC/Lab-01/images/poridhilab2.png)
 
 
 4. Configure with your application's IP and port:
 
     Enter the taken IP with each port (FastApi, RabbitMq UI, Flower). 
 
-![Load Balancer Details](../../DOC/Lab-01/images/poridhilab3.png)
+![Load Balancer Details](./DOC/Lab-01/images/poridhilab3.png)
 
-![Load Balancer Final Setup](../../DOC/Lab-01/images/poridhilab4.png)
+![Load Balancer Final Setup](./DOC/Lab-01/images/poridhilab4.png)
 
 ## Usage
 
@@ -172,7 +172,7 @@ Domain name for a load balancer in the Poridhi lab environment (For 5000 port): 
 POST https://67ac2c9d1fcfb0b6f0fdcee7-lb-800.bm-southeast.lab.poridhi.io/api/tasks
 ```
 You can see:
-![alt text](../../DOC/Lab-01/images/poridhilab5.png)
+![alt text](./DOC/Lab-01/images/poridhilab5.png)
 **Headers:**
 ```
 Content-Type: application/json
@@ -216,7 +216,7 @@ Adjust the address according to yours:
 GET https://67ac2c9d1fcfb0b6f0fdcee7-lb-800.bm-southeast.lab.poridhi.io/api/tasks/<task_id>
 ```
 You can see:
-![alt text](../../DOC/Lab-01/images/poridhilab6.png)
+![alt text](./DOC/Lab-01/images/poridhilab6.png)
 ### Task Types
 
 1. **Data Processing**
@@ -265,7 +265,7 @@ Access the Flower dashboard at `http://localhost:5555` to:
 
 **Poridhi Lab:**
 
-![alt text](../../DOC/Lab-01/images/poridhilab7.png)
+![alt text](./DOC/Lab-01/images/poridhilab7.png)
 
 ## RabbitMQ Management UI
 - Access at: `http://localhost:15672`
@@ -274,7 +274,7 @@ Access the Flower dashboard at `http://localhost:5555` to:
  
  **Poridhi Lab:**
 
-![alt text](../../DOC/Lab-01/images/poridhilab8.png)
+![alt text](./DOC/Lab-01/images/poridhilab8.png)
 
 For poridhi lab, click on the respective load balancer link for FLower & RaabitMq Management UI. Look at the images for examples.
 
