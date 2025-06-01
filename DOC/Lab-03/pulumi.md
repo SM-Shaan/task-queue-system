@@ -350,8 +350,7 @@ flower_sg = aws.ec2.SecurityGroup("flower-sg",
 # Create an EC2 key pair
 key_pair = aws.ec2.KeyPair("app-key-pair",
     key_name="app-key-pair",
-    # public_key="ssh-rsa YOUR_PUBLIC_KEY_HERE"  # Replace with your public key
-    public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCmPe6iw/kbZCbaQxaauIVEl9Vn8SWzijFREVwZx6anWBkJwhGNhRX4N7AXV35/fMdeiJmxHBr+wH6P2KJAg3NDX7a3VdDcoUPqzFKCzjAd6SvkELz+Gi6FjL+dFARhnGhoXuQD628DE+BvfD3XMV3YKJmfcWqXb5ciSDP/+rm6AL7XDT1M4ErgkQ63h2qfCizBMEsP5IwNw/ZmniE7sDXT2CG6MaW9yFenTbKC/k2xElx4WjtuVBlEHV72l+Er4sOVm5VXCQS0BUCYxu/BWHoWwmESZRtYsg7v1vLLqQrBSej1Lsmwj7aIMkQNjOHiv3BWO77+uoDwBjU7ExiZmoBn shaan@DESKTOP-RN29TTL"  # Replace with your public key
+    public_key="ssh-rsa YOUR_PUBLIC_KEY_HERE"  # Replace with your public key
 )
 
 
